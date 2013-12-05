@@ -1,0 +1,39 @@
+{
+  "name": "entities",
+  "description": "A framework to use a pure Entity Component System running in a MySQL database",
+  "version": "0.0.1",
+  "author": {
+    "name": "Anthony Pigeot",
+    "email": "anthony.pigeot@gmail.com"
+  },
+  "engines": {
+    "node": ">= 0.10.0"
+  },
+  "dependencies": {
+    "underscore": "1.5.2",
+    "mysql": "2.0.0-rc1",
+    "debug": "0.7.4"
+  },
+  "devDependencies": {
+    "mocha": "~1.15.1",
+    "should": "~2.1.1"
+  },
+  "keywords": [
+    "entity",
+    "component",
+    "system"
+  ],
+  "repository": {
+    "type": "git",
+    "url": "git://github.com/Malharhak/MySQL-Entities"
+  },
+  "main": "index",
+  "scripts": {
+    "test": "mocha"
+  },
+  "readmeFilename": "Readme.md",
+  "bugs": {
+    "url": "https://github.com/Malharhak/MySQL-Entities/issues"
+  },
+  "homepage": "https://github.com/Malharhak/MySQL-Entities"
+}
