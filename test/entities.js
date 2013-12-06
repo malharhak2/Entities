@@ -51,6 +51,27 @@ describe('Entities', function () {
 			});
 		});
 	});
+});
+
+describe ('Entities abstraction', function () {
+	
+	describe ('#initializeIds', function () {
+		it ('should return the list of components and assemblages', function (done) {
+			entities.initializeIds(componentsList, assemblagesList, function (err, res) {
+				if (err) throw err;
+				should.exist (res);
+				res.should.have.property('position', 1);
+				res.should.have.property('position_table', 'position_data');
+				res.should.have.property('player', 1);
+				res.should.have.property('player_label', 'Player');
+				res.should.have.property('player_comps');
+				done();
+			});
+		})
+	})
+});
+
+describe ('Entities usage', function () {
 	describe ('#createEntity', function () {
 		it ('should create an entity and return its id', function (done) {
 			entities.createEntity("lol", function (err, res) {
@@ -61,33 +82,31 @@ describe('Entities', function () {
 			});
 		});
 	});
-});
-
-describe ('Entities abstraction', function () {
-	describe ('#getComponentAndDataIdsR', function () {
-		it ('should return the list of all components id', function (done) {
-			entities.getComponentAndDataIdsR (componentsList, function (err, res) {
+	describe ('#createComponentAndAddTo', function () {
+		it ('should create a position component and add it to the first entity', function (done) {
+			entities.createComponentAndAddTo("position", 1, function (err) {
 				if (err) throw err;
-				should.exist (res);
-				res.should.have.property('position', 1);
-				res.should.have.property('position_table', 'position_data');
-				console.log(res);
 				done();
-			}, {});
+			}, {x : 10, y : 20, z : 100});
 		});
 	});
-	describe ('#getAssemblageAndCompsIds', function () {
-		it ('should return every assemblage ID, label, and its components', function (done) {
-			entities.getAssemblageAndCompsIds(assemblagesList, function (err, res) {
+	describe ('#getComponentDataForEntity', function () {
+		it ('should return the data previously added', function (done) {
+			entities.getComponentDataForEntity ("position", 1, function (err, res) {
 				if (err) throw err;
-				should.exist(res);
-				res.should.have.property('player', 1);
-				res.should.have.property('player_label', 'Player');
-				res.should.have.property('player_comps');
-				res['player_comps'][0].should.equal(1);
-				console.log(res);
+				should.exist (res);
+				res.should.have.property('x', 10);
+				res.should.have.property ('z', 100);
 				done();
-			}, {});
+			});
+		});
+	});
+	describe ('#setComponentDataForEntity', function () {
+		it ('should set the data correctly', function (done) {
+			entities.setComponentDataForEntity ("position", 1, {x : 666}, function (err) {
+				if (err) throw err;
+				done();
+			});
 		});
 	});
 });
