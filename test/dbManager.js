@@ -1,5 +1,4 @@
 var should = require('should');
-var entities = require('./../index');
 var db = require('./../dev/db').testdb;
 
 var mysql = require('mysql');
@@ -9,52 +8,9 @@ var dbManager;
 
 
 // An example components list that will be added to the test DB
-var componentsList = [
-	{
-		"x" : "FLOAT",
-		"y" : "FLOAT",
-		"z" : "FLOAT",
-		"__desc" : "This is a position, yo",
-		"__name" : "position"
-	},
-	{
-		"x" : "FLOAT",
-		"y" : "FLOAT",
-		"z" : "FLOAT",
-		"__desc" : "What's up ?",
-		"__name" : "rotation"
-	},
-	{
-		"hp" : "MEDIUMINT",
-		"str" : "SMALLINT",
-		"agi" : "SMALLINT",
-		"itl" : "SMALLINT",
-		"__desc" : "This is a stats list, so you can play dungeons and dragons bro",
-		"__name" : "stats"
-	},
-	{
-		"name" : "VARCHAR(70)",
-		"title" : "VARCHAR(70)",
-		"__desc" : "Some character info",
-		"__name" : "character_info"
-	}
-];
+var componentsList = require('./../dev/testComponents');
 
-var assemblages = [
-	{
-		"components" : ["position", "rotation", "stats", "character_info"],
-		"default_label" : "Player",
-		"__desc" : "That's you, stupid",
-		"__name" : "player"
-	},
-	{
-		"components" : ["position", "rotation"],
-		"default_label" : "Prop",
-		"__desc" : "That's a prop. Like a bush or something.",
-		"__name" : "prop"
-	}
-];
-
+var assemblages = require('./../dev/testAssemblages');
 
 // These tests try to connect to the test database and empty it for testing purposes
 describe ('mysql', function () {

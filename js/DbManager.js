@@ -4,6 +4,32 @@ var DbManager = function (connection) {
 	this.tableGenerationCounter = 0;
 	this.secondGenerationCounter = 0;
 };
+
+// Generates every tables, given the list of components and assemblages
+DbManager.prototype.generateEveryTable = function (components, assemblages, callback) {
+	var that = this;
+	this._generateBaseTables (function (err) {
+		if (err) callback (err);
+		else that._generateComponentDataTablesR (components, function (err) {
+			if (err) callback (err);
+			else that._generateAssemblagesTablesR(assemblages, function (err) {
+				if (err) callback (err);
+				else callback();
+			});
+		});
+	});
+};
+DbManager.prototype.resetDatabase = function (database, callback) {
+	var that = this;
+	this.connection.query ("DROP DATABASE " + database, function (err) {
+		if (err) callback (err);
+		else that.connection.query ("CREATE DATABASE " + database, function (err) {
+			if (err) callback (err);
+			else callback();
+		});
+	});
+};
+
 DbManager.prototype._generateBaseTables = function (callback) {
 	var err = false;
 	// Table containing every assemblage
@@ -33,7 +59,8 @@ DbManager.prototype._generateBaseTables = function (callback) {
 	var entityCompReq = "CREATE TABLE entity_components ("
 		+ "entity_id MEDIUMINT UNSIGNED NOT NULL,"
 		+ "component_id MEDIUMINT UNSIGNED NOT NULL,"
-		+ "component_data_id MEDIUMINT UNSIGNED NOT NULL)";
+		+ "component_data_id MEDIUMINT UNSIGNED NOT NULL AUTO_INCREMENT,"
+		+ "PRIMARY KEY(component_data_id))";
 	var con = this.connection;
 	// Executing all this
 	con.query(assemblageReq, function (err) {
@@ -69,7 +96,7 @@ DbManager.prototype._generateComponentDataTablesR = function (components, callba
 			query += "," + j + " " + comp[j];
 		}
 	}
-	query += ", PRIMARY KEY (component_data_id))";
+	query += ")";
 	// Creates the data table
 	this.connection.query(query, function (err) {
 		if (err) {
