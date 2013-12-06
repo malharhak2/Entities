@@ -1,7 +1,7 @@
 var should = require('should');
 var db = require ('./../dev/db').testdb;
 var entities = require('./../index');
-
+var _ = require('underscore');
 // An example components and assemblage list that will be added to the test DB
 var componentsList = require('./../dev/testComponents');
 var assemblagesList = require('./../dev/testAssemblages');
@@ -106,6 +106,46 @@ describe ('Entities usage', function () {
 			entities.setComponentDataForEntity ("position", 1, {x : 666}, function (err) {
 				if (err) throw err;
 				done();
+			});
+		});
+	});
+});
+
+describe ('Performance tests', function () {
+	describe('#createEntity', function () {
+		it ('should take less than 10 ms to create 1000 entities', function (done) {
+			var time = Date.now();
+			var query = "INSERT INTO entities (label) VALUES ";
+			for (var i = 0; i < 600; i++) {
+				query += "('lol " + i + "')";
+				if (i != 599) query += ",";
+			};
+			entities.connection.query (query, function (err) {
+				if (err) throw err;
+				var delta = Date.now() - time;
+				delta.should.be.below(15);
+				console.log("===== PERFORMANCE =====");
+				console.log("Time to create 1000 entities: " + delta);
+				done();
+			});
+		});
+	});
+	describe ('#lookupEntities', function () {
+		it ('should take less then 10 ms to lookup in a list of 10 000 entities', function (done) {
+			var query = "INSERT INTO position_data (x, y, z) VALUES ";
+			for (var i = 0; i < 10000; i++) {
+				query += "(" + _.random (0, 1000) + ", " + _.random(0, 1000) + ", " + _.random(0, 1000) + ")";
+				if (i != 9999) query += ",";
+			};
+			entities.connection.query (query, function (err) {
+				if (err) throw err;
+				var time = Date.now();
+				entities.connection.query ("SELECT * from position_data WHERE (x<500 AND y > 300) ORDER BY z DESC", function (err, rows) {
+					if (err) throw err;
+					var delta = Date.now() - time;
+					console.log("Time to select from a 10,000 entries table: " + delta);
+					done();
+				});
 			});
 		});
 	});

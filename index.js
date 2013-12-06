@@ -120,6 +120,7 @@ Entities.prototype.connect = function (callback) {
 	});
 };
 
+// Wraps the two next functions to initialize the ID recuperation
 Entities.prototype.initializeIds = function (components, assemblages, callback) {
 	var that = this;
 	this.ids = {};
