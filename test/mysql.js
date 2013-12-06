@@ -1,30 +1,18 @@
-var mysql = require('mysql');
-var config = require('./../js/db');
 var should = require('should');
+var entities = require('./../index');
+var db = require('./../dev/db');
 
-describe ('config', function () {
-	describe('#maxPlayersPerRoom', function () {
-		config.should.have.property('host');
-	});
-});
-
-var connection;
-describe ('mysql', function () {
-	describe ('#createConnection', function () {
-		it('should create without error', function () {
-			connection = mysql.createConnection(config);
+describe('entities', function () {
+	describe('#configMysql', function () {
+		it ('should set the mysql value of entities', function () {
+			entities.configMysql(db);
+			entities.mysql.host.should.equal(db.host);
 		});
 	});
-});
-
-describe('connection', function () {
-	describe ('#connect', function () {
+	describe('#connect', function () {
 		it ('should connect without error', function (done) {
-			connection.connect (function (err) {
-				if (err) {
-					console.log(err.code);
-					throw err;
-				}
+			entities.connect (function (err) {
+				if (err) throw err;
 				done();
 			});
 		});

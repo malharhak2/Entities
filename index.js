@@ -6,6 +6,7 @@ var Entities = function () {
 
 Entities.prototype.configMysql = function (options) {
 	this.mysql = options;
+	this.database = {};
 };
 Entities.prototype.connect = function (callback) {
 	this.connection = mysql.createConnection (this.mysql);
@@ -16,6 +17,9 @@ Entities.prototype.connect = function (callback) {
 			callback();
 		}
 	});
+};
+Entities.prototype.createTables = function (callback) {
+
 };
 
 module.exports = new Entities();
