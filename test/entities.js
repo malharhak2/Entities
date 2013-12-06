@@ -4,7 +4,7 @@ var entities = require('./../index');
 
 // An example components and assemblage list that will be added to the test DB
 var componentsList = require('./../dev/testComponents');
-var assemblages = require('./../dev/testAssemblages');
+var assemblagesList = require('./../dev/testAssemblages');
 
 describe('Entities', function () {
 	describe ('#configMysql', function () {
@@ -31,7 +31,7 @@ describe('Entities', function () {
 	});
 	describe ('#generateTables', function () {
 		it ('should generate every table', function (done) {
-			entities.generateTables (componentsList, assemblages, function (err) {
+			entities.generateTables (componentsList, assemblagesList, function (err) {
 				if (err) throw err;
 				done();
 			});
@@ -49,6 +49,45 @@ describe('Entities', function () {
 				rows[0].should.have.property('assemblage_id');
 				done();
 			});
+		});
+	});
+	describe ('#createEntity', function () {
+		it ('should create an entity and return its id', function (done) {
+			entities.createEntity("lol", function (err, res) {
+				if (err) throw err;
+				should.exist(res);
+				res.should.equal(1);
+				done();
+			});
+		});
+	});
+});
+
+describe ('Entities abstraction', function () {
+	describe ('#getComponentAndDataIdsR', function () {
+		it ('should return the list of all components id', function (done) {
+			entities.getComponentAndDataIdsR (componentsList, function (err, res) {
+				if (err) throw err;
+				should.exist (res);
+				res.should.have.property('position', 1);
+				res.should.have.property('position_table', 'position_data');
+				console.log(res);
+				done();
+			}, {});
+		});
+	});
+	describe ('#getAssemblageAndCompsIds', function () {
+		it ('should return every assemblage ID, label, and its components', function (done) {
+			entities.getAssemblageAndCompsIds(assemblagesList, function (err, res) {
+				if (err) throw err;
+				should.exist(res);
+				res.should.have.property('player', 1);
+				res.should.have.property('player_label', 'Player');
+				res.should.have.property('player_comps');
+				res['player_comps'][0].should.equal(1);
+				console.log(res);
+				done();
+			}, {});
 		});
 	});
 });
