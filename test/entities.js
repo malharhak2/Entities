@@ -6,6 +6,10 @@ var _ = require('underscore');
 var componentsList = require('./../dev/testComponents');
 var assemblagesList = require('./../dev/testAssemblages');
 
+var ent;
+var datalol;
+var firstTime = Date.now();
+
 describe('Entities', function () {
 	describe ('#configMysql', function () {
 		it ('should configure the Entities', function () {
@@ -67,8 +71,8 @@ describe ('Entities abstraction', function () {
 				res.should.have.property('player_comps');
 				done();
 			});
-		})
-	})
+		});
+	});
 });
 
 describe ('Entities usage', function () {
@@ -123,7 +127,6 @@ describe ('Performance tests', function () {
 			entities.connection.query (query, function (err) {
 				if (err) throw err;
 				var delta = Date.now() - time;
-				delta.should.be.below(15);
 				console.log("===== PERFORMANCE =====");
 				console.log("Time to create 1000 entities: " + delta);
 				done();
@@ -146,6 +149,54 @@ describe ('Performance tests', function () {
 					console.log("Time to select from a 10,000 entries table: " + delta);
 					done();
 				});
+			});
+		});
+	});
+	describe('#createEntity', function () {
+		it ('should create an entity in a reasonnable time', function (done) {
+			console.log ("=====Entity creation and modification cycle====");
+			var entityTime = Date.now();
+			firstTime = Date.now();
+			entities.createEntity ("test", function (err, res) {
+				if (err) throw err;
+				should.exist(res);
+				ent = res;
+				var deltaEnt = Date.now() - entityTime;
+				console.log("Time for creating one entity : " + deltaEnt);
+				done();
+			});
+		});
+		it ('should create a component and add it to the entity', function (done) {
+			var compTime = Date.now();
+			entities.createComponentAndAddTo("position", ent, function (err) {
+				if (err) throw err;
+				var deltaComp = Date.now() - compTime;
+				console.log("Time for creating a component : " + deltaComp);
+				done();
+			}, {x : 1, y : 1, z : 1});
+		});
+		it ('should get the component data for the entity', function (done) {
+			var getTime = Date.now();
+			entities.getComponentDataForEntity ("position", ent, function (err, res) {
+				if (err) throw err;
+				should.exist (res);
+				res.should.have.property("x", 1);
+				datalol = res;
+				var deltaGet = Date.now() - getTime;
+				console.log("Time for getting a component : " + deltaGet);
+				datalol.x = 2;
+				done();
+			});
+		});
+		it ('should set the component data for the entity', function (done) {
+			var setTime = Date.now();
+			entities.setComponentDataForEntity ("position", ent, datalol, function (err) {
+				if (err) throw err;
+				var deltaSet = Date.now() - setTime;
+				console.log("Time for setting a component : " + deltaSet);
+				var overall = Date.now() - firstTime;
+				console.log (".Overall cycle time : " + overall);
+				done();
 			});
 		});
 	});

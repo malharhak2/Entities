@@ -83,10 +83,15 @@ Entities.prototype.setComponentDataForEntity = function (component, entity, data
 		var valString = "";
 		var first = true;
 		for (var i in data) {
-			valString += (first ? "" : ", ") + i + "=" + data[i];
-			first = false;
-		}
-		that.connection.query ("UPDATE " + data_table + " SET " + valString + " WHERE (component_data_id=" + dataId + ")", function (err) {
+			if (data.hasOwnProperty (i)) {
+				if (i != "component_data_id") {
+					valString += (first ? "" : ", ") + i + "=" + data[i];
+					first = false;
+				}
+			}
+		};
+		var query = "UPDATE " + data_table + " SET " + valString + " WHERE (component_data_id=" + dataId + ")";
+		that.connection.query (query, function (err) {
 			callback (err);
 		})
 	})
