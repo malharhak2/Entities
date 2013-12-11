@@ -129,20 +129,15 @@ Entities.prototype.setComponentDataForEntity = function (component, entity, data
 }
 
 Entities.prototype.createAssemblage = function (assemblage, callback) {
-	console.log(this.ids);
 	var entity;
 	var label = this.ids[assemblage + '_label'];
 	var comps = this.ids[assemblage + '_comps'];
 	var that = this;
-	console.log (" Creating assemblage : " + assemblage);
-	console.log (" Label : " + label);
-	console.log ("comps : " + comps);
 	this.createEntity(label, function (err, id) {
 		if (err) {
 			callback (err);
 			return;
 		} else {
-			console.log ("entity id : " + id);
 			that.createAssemblageComponents(id, comps, 0, function (err) {
 				callback (err, id);
 			});

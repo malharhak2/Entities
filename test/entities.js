@@ -206,6 +206,8 @@ describe ('Performance tests', function () {
 			entities.createAssemblage("player", function (err, id) {
 				if (err) throw err;
 				should.exist(id);
+				var delta = Date.now() - asmTime;
+				console.log("Time to create an assemblage : " + delta);
 				done();
 			});
 		});
