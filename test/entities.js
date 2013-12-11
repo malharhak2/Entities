@@ -9,7 +9,7 @@ var assemblagesList = require('./../dev/testAssemblages');
 var ent;
 var datalol;
 var firstTime = Date.now();
-
+var entitiesCount = 1000;
 describe('Entities', function () {
 	describe ('#configMysql', function () {
 		it ('should configure the Entities', function () {
@@ -119,36 +119,38 @@ describe ('Performance tests', function () {
 	describe('#createEntity', function () {
 		it ('should take less than 10 ms to create 1000 entities', function (done) {
 			var time = Date.now();
-			var query = "INSERT INTO entities (label) VALUES ";
-			for (var i = 0; i < 600; i++) {
-				query += "('lol " + i + "')";
-				if (i != 599) query += ",";
-			};
-			entities.connection.query (query, function (err) {
+			entities.createEntities (entitiesCount, function (err, ret) {
 				if (err) throw err;
+				should.exist(ret);
 				var delta = Date.now() - time;
 				console.log("===== PERFORMANCE =====");
 				console.log("Time to create 1000 entities: " + delta);
 				done();
-			});
+			}, "lol");
 		});
 	});
 	describe ('#lookupEntities', function () {
-		it ('should take less then 10 ms to lookup in a list of 10 000 entities', function (done) {
+		it (('should insert 10,000 entries'), function (done) {
 			var query = "INSERT INTO position_data (x, y, z) VALUES ";
 			for (var i = 0; i < 10000; i++) {
 				query += "(" + _.random (0, 1000) + ", " + _.random(0, 1000) + ", " + _.random(0, 1000) + ")";
 				if (i != 9999) query += ",";
 			};
+			var insertStart = Date.now();
 			entities.connection.query (query, function (err) {
 				if (err) throw err;
-				var time = Date.now();
-				entities.connection.query ("SELECT * from position_data WHERE (x<500 AND y > 300) ORDER BY z DESC", function (err, rows) {
-					if (err) throw err;
-					var delta = Date.now() - time;
-					console.log("Time to select from a 10,000 entries table: " + delta);
-					done();
-				});
+				console.log("10,000 insert time :" + (Date.now() - insertStart));
+				done();
+			});
+		});
+		it ('should get back a third of the data', function (done) {
+			var time = Date.now();
+			entities.connection.query ("SELECT * from position_data WHERE (x<500 AND y > 300) ORDER BY z DESC", function (err, rows) {
+				if (err) throw err;
+				var delta = Date.now() - time;
+				should.exist(rows);
+				console.log("select 1/3 of 10,000: " + delta);
+				done();
 			});
 		});
 	});
@@ -196,6 +198,14 @@ describe ('Performance tests', function () {
 				console.log("Time for setting a component : " + deltaSet);
 				var overall = Date.now() - firstTime;
 				console.log (".Overall cycle time : " + overall);
+				done();
+			});
+		});
+		it ('should create a player assemblage', function (done) {
+			var asmTime = Date.now();
+			entities.createAssemblage("player", function (err, id) {
+				if (err) throw err;
+				should.exist(id);
 				done();
 			});
 		});

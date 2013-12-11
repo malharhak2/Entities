@@ -22,9 +22,37 @@ Entities.prototype.createEntity = function (label, callback) {
 	});
 };
 
+Entities.prototype.createEntities = function (labels, callback, lab) {
+	var that = this;
+	var hasLabels = (typeof labels == "object");
+	var count = hasLabels ? labels.length : labels;
+	var monolabel = lab | "";
+	var query = "INSERT INTO entities (label) VALUES ";
+	for (var i = 0; i < count; i++) {
+		query += "('" + (hasLabels ? labels[i] : monolabel) + "')";
+		if (i != count - 1) query += ",";
+	};
+	this.connection.query (query, function (err) {
+		if (err) {
+			callback (err);
+			return;
+		}
+		that.connection.query ("SELECT LAST_INSERT_ID()", function (err, rows) {
+			var ret = [];
+			var id = rows[0]['LAST_INSERT_ID()'];
+			for (var i = id; i < id + count; i++) {
+				ret.push(i);
+			};
+			callback (err, ret);
+		});
+	});
+};
+
 Entities.prototype.createComponentAndAddTo = function (component, entity, callback, values) {
 	var that = this;
-	var component_id = that.ids[component];
+	var component_id = (typeof component == "string") ? that.ids[component] : component;
+	var component_name = (typeof component == "string") ? component : that.ids[component];
+	console.log ("comp : " + component_id);
 	this.connection.query ("INSERT INTO entity_components (component_id, entity_id) VALUES (" + component_id + ", " + entity + ")", function (err) {
 		if (err) {
 			callback (err);
@@ -41,11 +69,14 @@ Entities.prototype.createComponentAndAddTo = function (component, entity, callba
 			var valString2 = "";
 			if (values) {
 				for (var i in values) {
+					var val = values[i];
+					var s = (typeof val == "string");
 					valString1 += ", " + i;
-					valString2 += ", " + values[i];
+					valString2 += ", " + ((s)?"'":"") + val + ((s)?"'":"");
 				};
 			}
-			var req = "INSERT INTO " + that.ids[component + "_table"] + " (component_data_id" + valString1 + ") VALUES (" + id + valString2 + ")";
+			var req = "INSERT INTO " + that.ids[component_name + "_table"] + " (component_data_id" + valString1 + ") VALUES (" + id + valString2 + ")";
+			console.log(req);
 			that.connection.query (req, function (err) {
 				callback (err);
 			})
@@ -95,6 +126,40 @@ Entities.prototype.setComponentDataForEntity = function (component, entity, data
 			callback (err);
 		})
 	})
+}
+
+Entities.prototype.createAssemblage = function (assemblage, callback) {
+	console.log(this.ids);
+	var entity;
+	var label = this.ids[assemblage + '_label'];
+	var comps = this.ids[assemblage + '_comps'];
+	var that = this;
+	console.log (" Creating assemblage : " + assemblage);
+	console.log (" Label : " + label);
+	console.log ("comps : " + comps);
+	this.createEntity(label, function (err, id) {
+		if (err) {
+			callback (err);
+			return;
+		} else {
+			console.log ("entity id : " + id);
+			that.createAssemblageComponents(id, comps, 0, function (err) {
+				callback (err, id);
+			});
+		}
+	});
+}
+Entities.prototype.createAssemblageComponents = function (entity, comps, step, callback) {
+	var that = this;
+	this.createComponentAndAddTo(comps[step], entity, function (err) {
+		
+		step++;
+		if (step < comps.length) {
+			that.createAssemblageComponents (entity, comps, step, callback);
+		} else {
+			callback (err);
+		}
+	});
 }
 
 //---------------
@@ -154,6 +219,7 @@ Entities.prototype.getComponentAndDataIdsR = function (components, callback, ans
 	var req = "SELECT * from components WHERE (name='" + name + "')";
 	this.connection.query(req, function (err, rows) {
 		answer[name] = rows[0]['component_id'];
+		answer[rows[0]['component_id']] = name;
 		answer[name + "_table"] = rows[0]['table_name'];
 		that.componentsIterator++
 		if (that.componentsIterator < components.length) {
