@@ -1,6 +1,6 @@
 {
   "name": "entities",
-  "description": "A framework to use a pure Entity Component System running in a MySQL database",
+  "description": "A framework to use a pure Entity Component System running in a mongodb database",
   "version": "0.0.1",
   "author": {
     "name": "Anthony Pigeot",
@@ -11,7 +11,7 @@
   },
   "dependencies": {
     "underscore": "1.5.2",
-    "mysql": "2.0.0-rc1",
+    "mongoose": "3.8.1",
     "debug": "0.7.4"
   },
   "devDependencies": {

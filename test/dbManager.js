@@ -1,7 +1,6 @@
 var should = require('should');
 var db = require('./../dev/db').testdb;
 
-var mysql = require('mysql');
 var connection;
 var DbManager = require('./../js/DbManager');
 var dbManager;
@@ -11,7 +10,7 @@ var dbManager;
 var componentsList = require('./../dev/testComponents');
 
 var assemblages = require('./../dev/testAssemblages');
-
+/*
 // These tests try to connect to the test database and empty it for testing purposes
 describe ('mysql', function () {
 	it ('should connect to mysql as root', function (done) {
@@ -98,3 +97,5 @@ describe ('dbManager', function () {
 	});
 	
 });
+
+*/

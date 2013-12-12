@@ -10,6 +10,7 @@ var ent;
 var datalol;
 var firstTime = Date.now();
 var entitiesCount = 1000;
+/*
 describe('Entities', function () {
 	describe ('#configMysql', function () {
 		it ('should configure the Entities', function () {
@@ -214,3 +215,4 @@ describe ('Performance tests', function () {
 		});
 	});
 });
+*/ 
