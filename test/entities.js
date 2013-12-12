@@ -10,14 +10,24 @@ var ent;
 var datalol;
 var firstTime = Date.now();
 var entitiesCount = 1000;
+
+describe('Entities', function () {
+	describe ('createConnection', function () {
+		it ('should connect to mongo', function (done) {
+			entities.createConnection (db, function (err, res) {
+				if (err) throw err;
+				should.exist (res);
+				done();
+			});
+		});
+	});
+});
 /*
 describe('Entities', function () {
 	describe ('#configMysql', function () {
 		it ('should configure the Entities', function () {
 			entities.configMysql(db);
-			entities.should.have.property('mysql');
-		});
-	});
+			entities.should.have.propert
 	describe ('#connect', function () {
 		it ('should connect to mysql', function (done) {
 			entities.connect (function (err) {

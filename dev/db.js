@@ -9,10 +9,7 @@ module.exports = {
 	// (The test database is deleted and recreated at each test)
 	testdb : { 
 		host : "localhost",
-		user : "root",
-		password : "root",
-		port : 3306,
-		database : "teststuff"
+		database : "mmotest"
 	}
 	
 };
