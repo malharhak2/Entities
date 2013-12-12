@@ -38,29 +38,34 @@ DbManager.prototype._generateBaseTables = function (callback) {
 		+ "default_label VARCHAR(70),"
 		+ "name VARCHAR(70),"
 		+ "description VARCHAR(255),"
-		+ "PRIMARY KEY (assemblage_id))";
+		+ "PRIMARY KEY (assemblage_id))"
+		+ " ENGINE=NDB";
 	// Table containing assemblage-component combinations
 	var asscompReq = "CREATE TABLE assemblage_components ("
 		+ "assemblage_id MEDIUMINT UNSIGNED NOT NULL,"
-		+ "component_id MEDIUMINT UNSIGNED NOT NULL)";
+		+ "component_id MEDIUMINT UNSIGNED NOT NULL)"
+		+ " ENGINE=NDB";
 	// Table containing all components
 	var compReq = "CREATE TABLE components ("
 		+ "component_id MEDIUMINT UNSIGNED NOT NULL AUTO_INCREMENT,"
 		+ "name VARCHAR(70),"
 		+ "description VARCHAR(255),"
 		+ "table_name VARCHAR(80),"
-		+ "PRIMARY KEY (component_id))";
+		+ "PRIMARY KEY (component_id))"
+		+ " ENGINE=NDB";
 	// Table containing all entities
 	var entityReq = "CREATE TABLE entities ("
 		+ "entity_id MEDIUMINT UNSIGNED NOT NULL AUTO_INCREMENT,"
 		+ "label VARCHAR(70),"
-		+ "PRIMARY KEY(entity_id))";
+		+ "PRIMARY KEY(entity_id))"
+		+ " ENGINE=NDB";
 	// Table containing entity-component combinations
 	var entityCompReq = "CREATE TABLE entity_components ("
 		+ "entity_id MEDIUMINT UNSIGNED NOT NULL,"
 		+ "component_id MEDIUMINT UNSIGNED NOT NULL,"
 		+ "component_data_id MEDIUMINT UNSIGNED NOT NULL AUTO_INCREMENT,"
-		+ "PRIMARY KEY(component_data_id))";
+		+ "PRIMARY KEY(component_data_id))"
+		+ " ENGINE=NDB";
 	var con = this.connection;
 	// Executing all this
 	con.query(assemblageReq, function (err) {
@@ -96,7 +101,8 @@ DbManager.prototype._generateComponentDataTablesR = function (components, callba
 			query += "," + j + " " + comp[j];
 		}
 	}
-	query += ")";
+	query += ")"
+		+ "ENGINE=NDB";
 	// Creates the data table
 	this.connection.query(query, function (err) {
 		if (err) {

@@ -52,7 +52,6 @@ Entities.prototype.createComponentAndAddTo = function (component, entity, callba
 	var that = this;
 	var component_id = (typeof component == "string") ? that.ids[component] : component;
 	var component_name = (typeof component == "string") ? component : that.ids[component];
-	console.log ("comp : " + component_id);
 	this.connection.query ("INSERT INTO entity_components (component_id, entity_id) VALUES (" + component_id + ", " + entity + ")", function (err) {
 		if (err) {
 			callback (err);
@@ -76,7 +75,6 @@ Entities.prototype.createComponentAndAddTo = function (component, entity, callba
 				};
 			}
 			var req = "INSERT INTO " + that.ids[component_name + "_table"] + " (component_data_id" + valString1 + ") VALUES (" + id + valString2 + ")";
-			console.log(req);
 			that.connection.query (req, function (err) {
 				callback (err);
 			})

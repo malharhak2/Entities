@@ -50,6 +50,7 @@ describe('Entities', function () {
 			entities.connection.query("SELECT * from assemblages WHERE (name='player')", function (err, rows) {
 				if (err) throw err;
 				should.exist(rows);
+				should.exist(rows[0]);
 				rows[0].should.have.property('assemblage_id');
 				done();
 			});
