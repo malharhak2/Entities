@@ -5,7 +5,7 @@ var _ = require('underscore');
 // An example components and assemblage list that will be added to the test DB
 var componentsList = require('./../dev/testComponents');
 var assemblagesList = require('./../dev/testAssemblages');
-
+var q = require('q');
 var ent;
 var datalol;
 var firstTime = Date.now();
@@ -14,10 +14,11 @@ var entitiesCount = 1000;
 describe('Entities', function () {
 	describe ('createConnection', function () {
 		it ('should connect to mongo', function (done) {
-			entities.createConnection (db, function (err, res) {
-				if (err) throw err;
-				should.exist (res);
+			entities.createConnection(db).then (function (res) {
+				should.exist(res);
 				done();
+			}, function (err) {
+				throw err;
 			});
 		});
 	});
