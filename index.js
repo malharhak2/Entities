@@ -16,27 +16,96 @@ Entities.prototype.createEntity = function (label, callback) {
 		label : label,
 		"_id" : id
 	});
+	var defer = Q.defer();
 	entity.save (function (err, res) {
-		if (err) throw err;
-		callback (id);
+		if (err) defer.reject(err);
+		else defer.resolve(res);
 	});
+	return defer.promise;
 };
 Entities.prototype.createComponent = function (component, data, callback) {
 	var dataID = mongoose.Types.ObjectId();
-	data["_id"] = dataID;
-	var component = new this.dataModels[component + 'Data'](data);
-	component.save (function (err, component) {
-		if (err) throw err;
-		callback ()
+	if (data) {
+		data["_id"] = dataID;
+	}
+	var defer = Q.defer();
+	if (!this.dataModels[component]) {
+		console.log("data models " + this.dataModels);
+		console.log("conponent " + component);
+		defer.reject ("unknown type");
+		return defer.promise;
+	}
+	var comp = new this.dataModels[component](data);
+	comp.save (function (err, res) {
+		if (err) defer.reject (err);
+		else defer.resolve (res);
 	});
-	return dataID;
+	return defer.promise;
 };
 Entities.prototype.createComponentAndAddTo = function (component, entity, data, callback) {
-	var dataID = this.createComponent (component, data);
-	var entity = Entity.find({"_id" : entity}, function (err, res) {
-
+	var deferred = Q.defer();
+	this.createComponent (component, data).then (function (compo) { // Create the component
+		entity.components.push(component);
+		entity.data.push(compo._id); // Adds info to component
+		entity.save(function (err, res) {
+			if (err) deferred.reject (err);
+			else deferred.resolve(res);
+		});
+	}, function (err) {
+		deferred.reject (err);
 	});
-
+	return deferred.promise;
+};
+Entities.prototype.addMultipleComponents = function (components, entity) {
+	var funcs = [];
+	var that=this;
+	var deferred = Q.defer();
+	for (var i = 0; i < components.length; i++) {
+		(function (i) {
+			var fnc = function () {
+				var defer =  Q.defer();
+				that.createComponentAndAddTo (components[i], entity).
+				then (function (res) {
+					defer.resolve (res);
+				}, function (err) {
+					defer.reject (err);
+				});
+				return defer.promise;
+			};
+			funcs.push (fnc);
+		})(i);
+	};
+	funcs.reduce (Q.when, Q()).
+	then (function (res) {
+		deferred.resolve (res);
+	}, function (err) {
+		deferred.reject (err);
+	});
+	return deferred.promise;
+}
+Entities.prototype.createAssemblage = function (asm, data) {
+	var assemblage = this.assemblages[asm];
+	var defer = Q.defer();
+	var that = this;
+	this.createEntity().
+	then(function (entity) { //  Reussi a creer une entite
+		var deferred = Q.defer();
+		that.addMultipleComponents (assemblage, entity).
+		then (function (res) { // Reussi a add les components
+			deferred.resolve (res);
+		}, function (err) {
+			deferred.reject (err);
+		});
+		return deferred.promise;
+	}, function (err) {
+		defer.reject (err);
+	}).
+	then (function (res) { // a ajoute les components
+		defer.resolve (res);
+	}, function ( err) {
+		defer.reject (err);
+	});
+	return defer.promise;
 }
 // Initialization stuff
 Entities.prototype.createConnection = function (db, callback) {
