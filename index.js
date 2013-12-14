@@ -10,10 +10,12 @@ var Entities = function () {
 	this.dataModels = {};
 	this.assemblages = {};
 	this.entities = {};
+	this.ids = [];
 };
 Entities.prototype.createEntity = function (label) {
 	//var id = mongoose.Types.ObjectId();
-	var id = Math.random();
+	var id = this.entities.length;
+	this.ids.push(0);
 	var entity = {
 		_id : id, 
 		label : label,
@@ -41,7 +43,8 @@ Entities.prototype.destroyEntity = function (entity) {
 };
 Entities.prototype.createComponent = function (component, data) {
 	//var dataId = mongoose.Types.ObjectId();
-	var dataId = Math.random();
+	var dataId = this.ids.length;
+	this.ids.push (0);
 	var d = _.extend({"_id" : dataId}, data);
 
 	if (!this.dataModels[component]) {

@@ -105,7 +105,7 @@ describe('Entities', function () {
 		});
 	});
 });
-var createCount = 3000;
+var createCount = 1000;
 var players = [];
 describe ('Entities performance', function () {
 	describe ('#createAssemblage', function () {
