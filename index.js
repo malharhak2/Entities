@@ -12,15 +12,23 @@ var Entities = function () {
 	this.entities = {};
 };
 Entities.prototype.createEntity = function (label) {
-	var id = mongoose.Types.ObjectId();
+	//var id = mongoose.Types.ObjectId();
+	var id = Math.random();
+	var entity = {
+		_id : id, 
+		label : label,
+		components : [],
+		data : []
+	};
+	/*
 	var entity = new Entity({
 		label : label,
 		"_id" : id
 	});
-	entity.save ();
+	*/
 	this.entities[id] = entity;
 	return entity;
-}
+};
 Entities.prototype.destroyEntity = function (entity) {
 	for (var i = 0; i < entity.components.length; i++) {
 		compo = entity.components[i] + 'datas';
@@ -28,23 +36,26 @@ Entities.prototype.destroyEntity = function (entity) {
 		this[compo][dataId].remove();
 		delete this[compo][dataId];
 	}
-	entity.remove();
+	//entity.remove();
 	delete this.entities[entity._id];
 };
 Entities.prototype.createComponent = function (component, data) {
-	var dataId = mongoose.Types.ObjectId();
+	//var dataId = mongoose.Types.ObjectId();
+	var dataId = Math.random();
 	var d = _.extend({"_id" : dataId}, data);
 
 	if (!this.dataModels[component]) {
 		return false;
 	}
+	/*
 	var comp = new this.dataModels[component](d);
+	*/
+	var comp = d;
 	this[component + 'datas'][dataId] = comp
-	comp.save ();
 	return comp;
 };
 Entities.prototype.destroyComponent = function (component, id) {
-	this[component + 'datas'][id].remove();
+	//this[component + 'datas'][id].remove();
 	delete this[component + 'datas'][id];
 };
 Entities.prototype.saveComponent = function (component) {
@@ -67,7 +78,6 @@ Entities.prototype.createComponentAndAddTo = function (component, entity, data) 
 	var comp = this.createComponent (component, data)
 	entity.components.push (component);
 	entity.data.push (comp._id);
-	entity.save();
 	return entity;
 };
 Entities.prototype.addMultipleComponents = function (components, entity, data) {
@@ -77,13 +87,12 @@ Entities.prototype.addMultipleComponents = function (components, entity, data) {
 		entity.components.push (components[i]);
 		entity.data.push (comp._id);
 	};
-	entity.save();
 	return entity;
 }
 Entities.prototype.createAssemblage = function (asm, data, label) {
 	var components = this.assemblages[asm].components;
 	var lab = label ? label : this.assemblages[asm].defaultLabel;
-	var entity = this.createEntity(lab);
+	var entity = this.createEntity(label);
 	this.addMultipleComponents (components, entity, data);
 	return entity;
 };
@@ -91,23 +100,26 @@ Entities.prototype.getComponentId = function (entity, component) {
 	var dataId = 0;
 	for (var i = 0; i < entity.components.length; i++) {
 		if (component = entity.components[i]);
-		return entity.data[i]; 
-	}
-}
+		return entity.data[i];
+	};
+};
 Entities.prototype.getComponentForEntity = function (entity, component) {
 	var dataId = this.getComponentId(entity, component);
-	return this[component + 'datas'][dataId];
+	return this.getComponentData (component, dataId);
 };
 Entities.prototype.setComponentForEntity = function (entity, component, data) {
 	var dataId = this.getComponentId(entity, component);
-	_.extend(this[component + 'datas'][dataId], data);
+	this.setComponentData (component, _.extend(data, {"_id" : dataId}));
 };
-Entities.prototype.getComponentData = function (component) {
-	return this[component + 'datas'];
-};
+Entities.prototype.getComponentData = function (component, id) {
+	return this[component + 'datas'][id];
+}
 Entities.prototype.setComponentData = function (component, data) {
 	_.extend(this[component + 'datas'][data._id], data);
-	this[component + 'datas'][data._id].save();
+	//this[component + 'datas'][data._id].save();
+};
+Entities.prototype.getComponentsData = function (component) {
+	return this[component + 'datas'];
 };
 Entities.prototype.setComponentsData = function (component, data) {
 	for (var i = 0; i < data.length; i++) {

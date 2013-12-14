@@ -89,6 +89,52 @@ describe('Entities', function () {
 			player.components[0].should.equal("position");
 		});
 	});
+	describe ('#getComponentForEntity', function () {
+		it ('should return the player position data', function () {
+			var playerPos = entities.getComponentForEntity (player, "position");
+			should.exist (playerPos);
+			playerPos.should.have.property("x", 12);
+		});
+	});
+	describe('#setComponentForEntity', function () {
+		it ('should set the player x position to 32', function () {
+			entities.setComponentForEntity (player, "position", {x : 32});
+			var playerPos = entities.getComponentForEntity (player, "position");
+			should.exist (playerPos);
+			playerPos.should.have.property ("x", 32);
+		});
+	});
+});
+var createCount = 3000;
+var players = [];
+describe ('Entities performance', function () {
+	describe ('#createAssemblage', function () {
+		it ('should create ' + createCount + ' players in 10 ms', function () {
+			var startTime = Date.now();
+			for (var i = 0; i < createCount; i++) {
+				players.push (entities.createAssemblage ("player", [
+					{x : i, y : 2 * i, z : 3 * i},
+					{life : i}], "player " + i));
+			};
+			var delta = Date.now() - startTime;
+			console.log ("Time to create " + createCount + " assemblages : " + delta);
+			should.exist(players[0]);
+			should.exist(players[createCount - 1]);
+			players[5].should.have.property("label", "player 5");
+		});
+	});
+	describe ('#getComponentForEntity', function () {
+		it ('should get the ' + createCount + ' player positions', function () {
+			var positions = [];
+			var startTime = Date.now();
+			for (var i = 0; i < createCount; i++) {
+				positions.push (entities.getComponentForEntity (players[i], "position"));
+			};
+			var delta = Date.now() - startTime;
+			console.log ("Time to get " + createCount + " players : " + delta);
+			positions[20].should.have.property ("x", 20);
+		});
+	});
 });
 /*
 describe('Entities', function () {
