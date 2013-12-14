@@ -4,6 +4,6 @@ var schema = new mongoose.Schema({
 	components : [String],
 	data : [mongoose.Schema.Types.ObjectId]
 });
-var Entity = mongoose.model('Entity', schema);
+var Entity = mongoose.model('entity', schema);
 
 module.exports = Entity;

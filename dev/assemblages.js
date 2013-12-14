@@ -2,7 +2,7 @@ var entities = require('../index');
 
 var assemblages = {
 	player : {
-		comps : ["Position", "Stats"],
+		components : ["position", "stats"],
 		defaultLabel : "Player",
 		description : "Thats the player, yo"
 	}

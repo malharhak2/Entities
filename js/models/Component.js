@@ -3,6 +3,6 @@ var schema = new mongoose.Schema({
 	name : String,
 	description : String
 });
-var Component = mongoose.model('Component', schema);
+var Component = mongoose.model('component', schema);
 
 module.exports = Component;

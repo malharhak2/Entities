@@ -4,8 +4,8 @@ var schema = new mongoose.Schema ({
 	life : {type : Number, default : 0},
 	mana : {type : Number, default : 0}
 });
-entities.registerComponent ({
-	name : "Stats",
+module.exports = {
+	name : "stats",
 	description : "Player stats",
 	schema : schema
-});
+};

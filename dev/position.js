@@ -5,8 +5,9 @@ var schema = new mongoose.Schema ({
 	y : {type : Number, default : 0},
 	z : {type : Number, default : 0}
 });
-entities.registerComponent ({
-	name : "Position",
+
+module.exports = {
+	name : "position",
 	description : "X Y Z Position",
 	schema : schema
-});
+};

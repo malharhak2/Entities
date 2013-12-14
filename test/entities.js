@@ -2,18 +2,16 @@ var should = require('should');
 var db = require ('./../dev/db').testdb;
 var entities = require('./../index');
 var _ = require('underscore');
-// An example components and assemblage list that will be added to the test DB
-var componentsList = require('./../dev/testComponents');
-var assemblagesList = require('./../dev/testAssemblages');
+// An example components and assemblage list that will be added to th
+
 var Q = require('q');
 
-var ent;
-var datalol;
-var firstTime = Date.now();
-var entitiesCount = 1000;
+var assemblages = require ('../dev/assemblages');
+var position = require ('../dev/position');
+var stats = require ('../dev/stats');
 
 describe('Entities', function () {
-	describe ('createConnection', function () {
+	describe ('#createConnection', function () {
 		it ('should fail to connect', function (done) {
 			entities.createConnection().then (function (res) {
 				done(res);
@@ -31,53 +29,64 @@ describe('Entities', function () {
 			});
 		});
 	});
-	describe ('Create stuff', function () {
-		it ('should create an entity', function (done) {
-			entities.createEntity("kevin").then (function (res) {
-				should.exist(res);
-				ent = res;
-				done();
-			}, function (err) {
-				done(err);
-			});
+	describe ('#registerComponent', function () {
+		it ('should register the position comp', function () {
+			entities.registerComponent (position);
+			should.exist(entities.positiondatas);
 		});
-		it ('should create a conponent and add it', function (done) {
-			entities.createComponentAndAddTo("Position", ent, {x : 1}).then (function (res) {
-				should.exist (res);
-				done();
-			}, function (err) {
-				done(err);
-			});
+		it ('should register the stats comp', function () {
+			entities.registerComponent (stats);
+			should.exist(entities.statsdatas);
 		});
-		it ('should create a player assemblage', function (done) {
-			entities.createAssemblage ("Player").then (function (id) {
-				should.exist (id);
-				done();
-			}, function (err) {
-				
-				done(err);
-			});
+	});
+	describe ('#registerAssemblages', function () {
+		it ('should register the player assemblage', function () {
+			entities.registerAssemblages (assemblages);
+			should.exist(entities.assemblages.player);
 		});
-		it ('sjould create 100 assemblages', function (done) {
-			var fncs = [];
-			for (var i = 0; i < 100; i++) {
-				var fnc = function () {
-					var de = Q.defer();
-					entities.createAssemblage ("Player").then (function (id) {
-						de.resolve (id);
-					});
-					return de.promise;
-				};
-				fncs.push (fnc);
-			};
-			var time = Date.now();
-			fncs.reduce (Q.when, Q()).
-			then (function (res) {
-				console.log ("Time for 100 assemblages " + (Date.now() - time));
-				done();
-			}, function (err)  {
-				done (err);
-			});
+	});
+	var entity;
+	describe ('#CreateEntity', function () {
+		it ('should create an entity', function () {
+			entity = entities.createEntity ();
+			should.exist (entity);
+			should.exist (entities.entities[entity._id]);
+		});
+	});
+
+	describe ('#destroyEntity', function () {
+		it ('should destroy the entity', function () {
+			var id = entity._id;
+			should.exist (entities.entities[id]);
+			entities.destroyEntity (entity);
+			should.not.exist (entities.entities[id]);
+		});
+	});
+	var component;
+	describe ('#createComponent', function () {
+		it ('should create a component', function () {
+			component = entities.createComponent ("position");
+			should.exist (component);
+			should.exist(entities["positiondatas"][component._id]);
+		});
+	});
+	describe ('#destroyComponent', function () {
+		it ('should destroy the component', function () {
+			var id = component._id;
+			should.exist (entities.positiondatas[id]);
+			entities.destroyComponent ("position", id);
+			should.not.exist (entities.positiondatas[id]);
+		});
+	});
+	var player;
+	describe ('#createAssemblage', function () {
+		it ('should create a player assemblage', function () {
+			player = entities.createAssemblage ("player", [
+				{x : 12, y : 24}, 
+				{life : 200}]);
+			should.exist (player);
+			player.should.have.property("components");
+			player.components[0].should.equal("position");
 		});
 	});
 });
@@ -280,7 +289,6 @@ describe ('Performance tests', function () {
 				var delta = Date.now() - asmTime;
 				console.log("Time to create an assemblage : " + delta);
 				done();
-			});
 		});
 	});
 });
